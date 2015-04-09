@@ -1,0 +1,54 @@
+### the DISPATCHER is responsible for job management
+[dispatcher]
+type = local # run locally
+#ncores = 4 # optionally, specify number of cores (autodetect by default)
+
+# To use the OAR cluster at ESRF:
+
+#type = oar
+#tmpdir = /some/globally/available/path
+#oarsub_options = walltime=0:15 # optionally, tweak oarsub parameters
+#executable = python /data/id03/inhouse/binoculars/binoculars.py # optionally, override default location of python and/or BINoculars installation
+
+# Specificy destination file using scan numbers. The {first}-{last} part of the file name will be replaced by the actual scan numbers
+
+destination = ./examples/dataset/maps/scan_{first}-{last}.hdf5 
+overwrite = true
+
+# or, by default: numbered files in the form output_###.hdf5:
+# destination = output.hdf5
+# overwrite = false
+
+### Choose an appropriate INPUT class and specify custom options
+
+[input]
+type = id03:eh2 # refers to class EH2 in BINoculars/backends/id03.py
+
+### Select the spec file where the analyzed scan belongs to
+
+specfile = ./examples/dataset/sixc_tutorial.spec
+
+### Select the image folder. {rUCCD[0]} (reverse UCCD list) value is the string of last directory in the UCCD tag in the spec file. The UCCD is the path to the image folder. For example: 
+#UCCD = /users/drnec/binoculars_tutorial/images/img_#n_#p_#r14567.edf and {rUCCD[0]}=images
+
+imagefolder = ./examples/dataset/{rUCCD[0]}/  # this will be replaced by ./examples/dataset/images/
+
+
+## approximate number of images per job, only useful when running on the oar cluster
+
+target_weight = 4000 
+
+# technical yadayada for this particular input class
+
+centralpixel = 345, 391   # x,y
+sdd = 586               # sample to detector distance (mm)
+pixelsize = 0.055, 0.055 # pixel size x/y (mm)
+ymask = 275-485  # y range of the mask. Only pixels within the mask will be taken into consideration
+xmask = 273-427  # x range of the mask
+
+
+### choose PROJECTION plus resolution
+
+[projection]
+type = id03:hklprojection # refers to HKLProjection in BINoculars/backends/id03.py
+resolution = 0.002, 0.002, 0.02 # Resolution in HKL space. You can also give 1 number for all dimensions
